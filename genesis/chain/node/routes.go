@@ -82,16 +82,16 @@ func (n *Node) rpcRoutes() map[string]*rpc.RPCFunc {
 		"info":                 rpc.NewRPCFunc(h.Info, argsWithChainID("")),
 
 		// Query RPC
-		"query_nonce":                       rpc.NewRPCFunc(h.QueryNonce, argsWithChainID("address")),
-		"query_account":                     rpc.NewRPCFunc(h.QueryAccount, argsWithChainID("address")),
-		"query_ledgers":                     rpc.NewRPCFunc(h.QueryLedgers, argsWithChainID("order,limit,cursor")),
-		"query_ledger":                      rpc.NewRPCFunc(h.QueryLedger, argsWithChainID("height")),
-		"query_payments":                    rpc.NewRPCFunc(h.QueryPayments, argsWithChainID("order,limit,cursor")),
-		"query_account_payments":            rpc.NewRPCFunc(h.QueryAccountPayments, argsWithChainID("address,order,limit,cursor")),
-		"query_payment":                     rpc.NewRPCFunc(h.QueryPayment, argsWithChainID("txhash")),
-		"query_transactions":                rpc.NewRPCFunc(h.QueryTransactions, argsWithChainID("order,limit,cursor")),
-		"query_transaction":                 rpc.NewRPCFunc(h.QueryTransaction, argsWithChainID("txhash")),
-		"query_account_transactions":        rpc.NewRPCFunc(h.QueryAccountTransactions, argsWithChainID("address,order,limit,cursor")),
+		"query_nonce":   rpc.NewRPCFunc(h.QueryNonce, argsWithChainID("address")),
+		"query_account": rpc.NewRPCFunc(h.QueryAccount, argsWithChainID("address")),
+		//		"query_ledgers":                     rpc.NewRPCFunc(h.QueryLedgers, argsWithChainID("order,limit,cursor")),
+		"query_ledger": rpc.NewRPCFunc(h.QueryLedger, argsWithChainID("height")),
+		//		"query_payments":                    rpc.NewRPCFunc(h.QueryPayments, argsWithChainID("order,limit,cursor")),
+		//		"query_account_payments":            rpc.NewRPCFunc(h.QueryAccountPayments, argsWithChainID("address,order,limit,cursor")),
+		//		"query_payment":                     rpc.NewRPCFunc(h.QueryPayment, argsWithChainID("txhash")),
+		//		"query_transactions":                rpc.NewRPCFunc(h.QueryTransactions, argsWithChainID("order,limit,cursor")),
+		"query_transaction": rpc.NewRPCFunc(h.QueryTransaction, argsWithChainID("txhash")),
+		//		"query_account_transactions":        rpc.NewRPCFunc(h.QueryAccountTransactions, argsWithChainID("address,order,limit,cursor")),
 		"query_contract":                    rpc.NewRPCFunc(h.QueryDoContract, argsWithChainID("byte[]")),
 		"query_contract_exist":              rpc.NewRPCFunc(h.QueryContractExist, argsWithChainID("address")),
 		"query_receipt":                     rpc.NewRPCFunc(h.QueryReceipt, argsWithChainID("txhash")),
@@ -196,15 +196,6 @@ func (h *rpcHandler) Block(height int) (at.RPCResult, at.CodeType, error) {
 	}
 	res := at.ResultBlock{}
 	res.Block, res.BlockMeta = h.node.Angine.GetBlock(height)
-	fmt.Println("===================", res.Block.Data.Txs)
-	for _, tx := range res.Block.Data.Txs {
-		txs := &types.Transaction{}
-		if err := rlp.DecodeBytes(tx, &txs.Data); err != nil {
-			fmt.Println("===================", err)
-		}
-		fmt.Println("===================", txs)
-		fmt.Println("===================", txs.Hash().Hex())
-	}
 	return &res, at.CodeType_OK, nil
 }
 
@@ -485,30 +476,29 @@ func (h *rpcHandler) QueryAccountTransactions(address string, order string, limi
 }
 
 func (h *rpcHandler) QueryLedgerTransactions(height uint64, order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
-	result := h.node.Application.QueryLedgerTransactions(height, order, limit, cursor)
-	if result.Code != at.CodeType_OK {
-		return nil, result.Code, errors.New(result.Log)
-	}
-	return result.Data, at.CodeType_OK, nil
+	//	result := h.node.Application.QueryLedgerTransactions(height, order, limit, cursor)
+	//	if result.Code != at.CodeType_OK {
+	//		return nil, result.Code, errors.New(result.Log)
+	//	}
+	//	return result.Data, at.CodeType_OK, nil
 
-	//	if height == 0 {
-	//		return nil, at.CodeType_OK, fmt.Errorf("height must be greater than 0")
-	//	}
-	//	if height > h.node.Angine.Height() {
-	//		return nil, at.CodeType_OK, fmt.Errorf("height must be less than the current blockchain height")
-	//	}
-	//	res := at.ResultBlock{}
-	//	res.Block, res.BlockMeta = h.node.Angine.GetBlock(height)
-	//	fmt.Println("===================", res.Block.Data.Txs)
-	//	for _, tx := range res.Block.Data.Txs {
-	//		txs := &types.Transaction{}
-	//		if err := rlp.DecodeBytes(tx, &txs.Data); err != nil {
-	//			fmt.Println("===================", err)
-	//		}
-	//		fmt.Println("===================", txs)
-	//		fmt.Println("===================", txs.Hash().Hex())
-	//	}
-	//	return &res, at.CodeType_OK, nil
+	if height == 0 {
+		return nil, at.CodeType_OK, fmt.Errorf("height must be greater than 0")
+	}
+	if height > uint64(h.node.Angine.Height()) {
+		return nil, at.CodeType_OK, fmt.Errorf("height must be less than the current blockchain height")
+	}
+	res := at.ResultBlock{}
+	res.Block, res.BlockMeta = h.node.Angine.GetBlock(int(height))
+	txResults := []*types.Transaction{}
+	for _, txData := range res.Block.Data.Txs {
+		txResult := &types.Transaction{}
+		if err := rlp.DecodeBytes(txData, &txResult); err != nil {
+			return nil, at.CodeType_WrongRLP, fmt.Errorf("decode error")
+		}
+		txResults = append(txResults, txResult)
+	}
+	return &txResults, at.CodeType_OK, nil
 }
 
 func (h *rpcHandler) QueryDoContract(query []byte) (interface{}, at.CodeType, error) {

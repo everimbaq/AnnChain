@@ -740,31 +740,15 @@ func (app *GenesisApp) QueryLedgers(order string, limit uint64, cursor uint64) a
 
 // query ledger info
 func (app *GenesisApp) QueryLedger(height uint64) at.NewRPCResult {
-	//	sequence := new(big.Int).SetUint64(height)
-	//  return app.queryLedger(sequence)
-
 	// query leveldb
 	ledgerHash := app.ReadHeaderCanonicalHash(new(big.Int).SetUint64(height))
 	ledgerData := app.ReadHeaderRLP(ledgerHash.Bytes(), height)
 
 	var ledger types.LedgerHeaderData
 	if err := rlp.DecodeBytes(ledgerData, &ledger); err != nil {
-		fmt.Println("=======================", err)
 		return at.NewRpcError(at.CodeType_WrongRLP, "fail to rlp decode")
 	}
-	result := types.QueryLedgerHeaderData{
-		LedgerID:         ledger.LedgerID,
-		Height:           ledger.Height,
-		Hash:             ethcmn.ToHex(ledger.Hash.Bytes()),
-		PrevHash:         ethcmn.ToHex(ledger.PrevHash.Bytes()),
-		TransactionCount: ledger.TransactionCount,
-		ClosedAt:         ledger.ClosedAt,
-		TotalCoins:       ledger.TotalCoins,
-		BaseFee:          ledger.BaseFee,
-		MaxTxSetSize:     ledger.MaxTxSetSize,
-	}
-
-	return at.NewRpcResultOK(result, "")
+	return at.NewRpcResultOK(ledger, "")
 }
 
 // query all payments

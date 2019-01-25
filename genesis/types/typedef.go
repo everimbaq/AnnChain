@@ -274,10 +274,10 @@ func (h *AppHeader) GetLedgerHeaderData() *LedgerHeaderData {
 
 	return &LedgerHeaderData{
 		Height:           h.Height,
-		Hash:             ethcmn.BytesToLedgerHash(h.Hash()),
-		PrevHash:         h.PrevHash,
+		Hash:             ethcmn.BytesToLedgerHash(h.Hash()).Hex(),
+		PrevHash:         h.PrevHash.Hex(),
 		TransactionCount: h.TxCount,
-		ClosedAt:         h.ClosedAt,
+		ClosedAt:         h.ClosedAt.String(),
 		TotalCoins:       h.TotalCoin,
 		BaseFee:          h.BaseFee,
 		MaxTxSetSize:     h.MaxTxSetSize,
