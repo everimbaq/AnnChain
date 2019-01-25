@@ -107,7 +107,11 @@ type GenesisApp struct {
 }
 
 var (
-	EmptyTrieRoot  = ethcmn.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+	EmptyTrieRoot      = ethcmn.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+	headerNumberPrefix = []byte("H") // headerNumberPrefix + hash -> num (uint64 big endian)
+	headerPrefix       = []byte("h") // headerPrefix + num (uint64 big endian) + hash -> header
+	headerHashSuffix   = []byte("n") // headerPrefix + num (uint64 big endian) + headerHashSuffix -> hash
+
 	ReceiptsPrefix = []byte("receipts-")
 	lastBlockKey   = []byte("lastblock")
 	logger         *zap.Logger
@@ -443,6 +447,9 @@ func (app *GenesisApp) OnCommit(height, round int, block *at.Block) (interface{}
 	if err != nil {
 		logger.Error("Save db data failed:" + err.Error())
 	}
+	ledgerHeader := app.currentHeader.GetLedgerHeaderData()
+	app.WriteHeaderCanonicalHash(appHash, app.currentHeader.Height)
+	app.SaveLastBlockHeader(appHash, ledgerHeader)
 
 	app.blockExeInfo = &blockExeInfo{}
 
@@ -595,6 +602,27 @@ func (app *GenesisApp) SaveLastBlock(appHash []byte, header *types.AppHeader) {
 	app.chainDb.Put(lastBlockKey, buf.Bytes())
 }
 
+func (app *GenesisApp) SaveLastBlockHeader(appHash []byte, header *types.LedgerHeaderData) {
+	// Write the hash -> number mapping
+	var (
+		number  = header.Height.Uint64()
+		encoded = encodeBlockNumber(number)
+	)
+	key := headerNumberKey(appHash)
+	if err := app.chainDb.Put(key, encoded); err != nil {
+		logger.Error("Failed to store hash to number mapping:" + err.Error())
+	}
+	// Write the encoded header
+	data, err := rlp.EncodeToBytes(header)
+	if err != nil {
+		logger.Error("Failed to RLP encode header:" + err.Error())
+	}
+	key = headerKey(header.Height, appHash)
+	if err := app.chainDb.Put(key, data); err != nil {
+		logger.Error("Failed to store header:" + err.Error())
+	}
+}
+
 func (app *GenesisApp) CheckTx(bs []byte) at.Result {
 
 	var err error
@@ -712,8 +740,31 @@ func (app *GenesisApp) QueryLedgers(order string, limit uint64, cursor uint64) a
 
 // query ledger info
 func (app *GenesisApp) QueryLedger(height uint64) at.NewRPCResult {
-	sequence := new(big.Int).SetUint64(height)
-	return app.queryLedger(sequence)
+	//	sequence := new(big.Int).SetUint64(height)
+	//  return app.queryLedger(sequence)
+
+	// query leveldb
+	ledgerHash := app.ReadHeaderCanonicalHash(new(big.Int).SetUint64(height))
+	ledgerData := app.ReadHeaderRLP(ledgerHash.Bytes(), height)
+
+	var ledger types.LedgerHeaderData
+	if err := rlp.DecodeBytes(ledgerData, &ledger); err != nil {
+		fmt.Println("=======================", err)
+		return at.NewRpcError(at.CodeType_WrongRLP, "fail to rlp decode")
+	}
+	result := types.QueryLedgerHeaderData{
+		LedgerID:         ledger.LedgerID,
+		Height:           ledger.Height,
+		Hash:             ethcmn.ToHex(ledger.Hash.Bytes()),
+		PrevHash:         ethcmn.ToHex(ledger.PrevHash.Bytes()),
+		TransactionCount: ledger.TransactionCount,
+		ClosedAt:         ledger.ClosedAt,
+		TotalCoins:       ledger.TotalCoins,
+		BaseFee:          ledger.BaseFee,
+		MaxTxSetSize:     ledger.MaxTxSetSize,
+	}
+
+	return at.NewRpcResultOK(result, "")
 }
 
 // query all payments
@@ -956,4 +1007,48 @@ func (app *GenesisApp) makeCurrentHeader(block *at.Block) *ethtypes.Header {
 		Time:   big.NewInt(block.Header.Time.Unix()),
 		Number: big.NewInt(int64(block.Height)),
 	}
+}
+
+// encodeBlockNumber encodes a block number as big endian uint64
+func encodeBlockNumber(number uint64) []byte {
+	enc := make([]byte, 8)
+	binary.BigEndian.PutUint64(enc, number)
+	return enc
+}
+
+// headerKey = headerPrefix + num (uint64 big endian) + hash
+func headerKey(height *big.Int, hash []byte) []byte {
+	return append(append(headerPrefix, encodeBlockNumber(height.Uint64())...), hash...)
+}
+
+// headerHashKey = headerPrefix + num (uint64 big endian) + headerHashSuffix
+func headerHashKey(height *big.Int) []byte {
+	return append(append(headerPrefix, encodeBlockNumber(height.Uint64())...), headerHashSuffix...)
+}
+
+// headerNumberKey = headerNumberPrefix + hash
+func headerNumberKey(hash []byte) []byte {
+	return append(headerNumberPrefix, hash...)
+}
+
+// WriteCanonicalHash stores the hash assigned to a canonical block number.
+func (app *GenesisApp) WriteHeaderCanonicalHash(hash []byte, height *big.Int) {
+	if err := app.chainDb.Put(headerHashKey(height), hash); err != nil {
+		logger.Error("Failed to store number to hash mapping:" + err.Error())
+	}
+}
+
+// ReadCanonicalHash retrieves the hash assigned to a canonical block number.
+func (app *GenesisApp) ReadHeaderCanonicalHash(height *big.Int) ethcmn.LedgerHash {
+	data, _ := app.chainDb.Get(headerHashKey(height))
+	if len(data) == 0 {
+		return ethcmn.LedgerHash{}
+	}
+	return ethcmn.BytesToLedgerHash(data)
+}
+
+// ReadHeaderRLP retrieves a block header in its raw RLP database encoding.
+func (app *GenesisApp) ReadHeaderRLP(hash []byte, number uint64) rlp.RawValue {
+	data, _ := app.chainDb.Get(headerKey(new(big.Int).SetUint64(number), hash))
+	return data
 }

@@ -79,6 +79,18 @@ type LedgerHeaderQueryData struct {
 	MaxTxSetSize     uint64    `json:"max_tx_set_size"`
 }
 
+type QueryLedgerHeaderData struct {
+	LedgerID         uint64    `json:"id"`
+	Height           *big.Int  `json:"height"`
+	Hash             string    `json:"hash"`
+	PrevHash         string    `json:"hash"`
+	TransactionCount uint64    `json:"transaction_count"`
+	ClosedAt         time.Time `json:"closed_at"`
+	TotalCoins       *big.Int  `json:"total_coins"`
+	BaseFee          *big.Int  `json:"base_fee"`
+	MaxTxSetSize     uint64    `json:"max_tx_set_size"`
+}
+
 type TransactionQueryData struct {
 	Hash     ethcmn.Hash    `json:"hash"`
 	Height   *big.Int       `json:"height"`
