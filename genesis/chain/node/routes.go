@@ -496,6 +496,11 @@ func (h *rpcHandler) QueryLedgerTransactions(height uint64, order string, limit 
 		if err := rlp.DecodeBytes(txData, &txResult); err != nil {
 			return nil, at.CodeType_WrongRLP, fmt.Errorf("decode error")
 		}
+
+		//		opCreateAccount := new(types.CreateAccount)
+		//		if err := json.Unmarshal(txResult.Data.Operation, opCreateAccount); err != nil {
+		//			return nil, err
+		//		}
 		txResults = append(txResults, txResult)
 	}
 	return &txResults, at.CodeType_OK, nil
