@@ -364,10 +364,10 @@ func (app *GenesisApp) ExecuteTx(stateDup *stateDup, bs []byte) (err error) {
 
 	action.GetActionBase().TxHash = tx.Hash()
 
-	for idx := range effects {
-		effects[idx].GetEffectBase().CreateAt = tx.GetCreateTime()
-		effects[idx].GetEffectBase().TxHash = tx.Hash()
-	}
+	//	for idx := range effects {
+	//		effects[idx].GetEffectBase().CreateAt = tx.GetCreateTime()
+	//		effects[idx].GetEffectBase().TxHash = tx.Hash()
+	//	}
 
 	app.blockExeInfo.effectG = append(app.blockExeInfo.effectG, &types.EffectGroup{
 		Action:  action,
@@ -535,24 +535,24 @@ func (app *GenesisApp) SaveDBData() error {
 	}
 	stmt.Close()
 
-	//save effect
-	stmt, err = app.dataM.PrepareEffect()
-	if err != nil {
-		app.dataM.QTxRollback()
-		return err
-	}
-	for _, a := range app.blockExeInfo.effectG {
-		for _, e := range a.Effects {
-			e.GetEffectBase().Height = app.currentHeader.Height
-			e.GetEffectBase().ActionID = a.ActionID
-			err = app.dataM.AddEffectDataStmt(stmt, e)
-			if err != nil {
-				app.dataM.QTxRollback()
-				return err
-			}
-		}
-	}
-	stmt.Close()
+	//	//save effect
+	//	stmt, err = app.dataM.PrepareEffect()
+	//	if err != nil {
+	//		app.dataM.QTxRollback()
+	//		return err
+	//	}
+	//	for _, a := range app.blockExeInfo.effectG {
+	//		for _, e := range a.Effects {
+	//			e.GetEffectBase().Height = app.currentHeader.Height
+	//			e.GetEffectBase().ActionID = a.ActionID
+	//			err = app.dataM.AddEffectDataStmt(stmt, e)
+	//			if err != nil {
+	//				app.dataM.QTxRollback()
+	//				return err
+	//			}
+	//		}
+	//	}
+	//	stmt.Close()
 	// commit dbtx
 	err = app.dataM.QTxCommit()
 	if err != nil {

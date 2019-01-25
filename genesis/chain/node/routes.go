@@ -176,16 +176,35 @@ func (h *rpcHandler) Genesis() (interface{}, at.CodeType, error) {
 	return &gesesis, at.CodeType_OK, nil
 }
 
-func (h *rpcHandler) Block(height int) (interface{}, at.CodeType, error) {
+func (h *rpcHandler) Block(height int) (at.RPCResult, at.CodeType, error) {
+	//	if height == 0 {
+	//		return "", at.CodeType_BaseInvalidInput, errors.New("height must be greater than 0")
+	//	}
+	//	if height > h.node.Angine.Height() {
+	//		return "", at.CodeType_BaseInvalidInput, errors.New("height must be less than the current blockchain height")
+	//	}
+	//	res := at.ResultBlock{}
+	//	res.Block, res.BlockMeta = h.node.Angine.GetBlock(height)
+
+	//	return &res, at.CodeType_OK, nil
+
 	if height == 0 {
-		return "", at.CodeType_BaseInvalidInput, errors.New("height must be greater than 0")
+		return nil, at.CodeType_OK, fmt.Errorf("height must be greater than 0")
 	}
 	if height > h.node.Angine.Height() {
-		return "", at.CodeType_BaseInvalidInput, errors.New("height must be less than the current blockchain height")
+		return nil, at.CodeType_OK, fmt.Errorf("height must be less than the current blockchain height")
 	}
 	res := at.ResultBlock{}
 	res.Block, res.BlockMeta = h.node.Angine.GetBlock(height)
-
+	fmt.Println("===================", res.Block.Data.Txs)
+	for _, tx := range res.Block.Data.Txs {
+		txs := &types.Transaction{}
+		if err := rlp.DecodeBytes(tx, &txs.Data); err != nil {
+			fmt.Println("===================", err)
+		}
+		fmt.Println("===================", txs)
+		fmt.Println("===================", txs.Hash().Hex())
+	}
 	return &res, at.CodeType_OK, nil
 }
 

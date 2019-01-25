@@ -77,23 +77,23 @@ func (pay *DoPayment) effects() {
 		Amount: pay.op.Amount.String(),
 	}
 
-	efts := []types.EffectObject{
-		&types.EffectAccountCredited{
-			EffectBase: types.EffectBase{
-				Typei:   types.EffectTypeAccountCredited,
-				Type:    types.EffectTypeAccountCredited.String(),
-				Account: pay.op.Destination,
-			},
-			Amount: pay.op.Amount.String(),
-		},
-		&types.EffectAccountDebited{
-			EffectBase: types.EffectBase{
-				Typei:   types.EffectTypeAccountDebited,
-				Type:    types.EffectTypeAccountDebited.String(),
-				Account: pay.op.Source,
-			},
-			Amount: pay.op.Amount.String(),
-		},
-	}
-	pay.op.SetEffects(act, efts)
+	//	efts := []types.EffectObject{
+	//		&types.EffectAccountCredited{
+	//			EffectBase: types.EffectBase{
+	//				Typei:   types.EffectTypeAccountCredited,
+	//				Type:    types.EffectTypeAccountCredited.String(),
+	//				Account: pay.op.Destination,
+	//			},
+	//			Amount: pay.op.Amount.String(),
+	//		},
+	//		&types.EffectAccountDebited{
+	//			EffectBase: types.EffectBase{
+	//				Typei:   types.EffectTypeAccountDebited,
+	//				Type:    types.EffectTypeAccountDebited.String(),
+	//				Account: pay.op.Source,
+	//			},
+	//			Amount: pay.op.Amount.String(),
+	//		},
+	//	}
+	pay.op.SetEffects(act, []types.EffectObject{})
 }
