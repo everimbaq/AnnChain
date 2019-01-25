@@ -496,31 +496,31 @@ func (app *GenesisApp) SaveDBData() error {
 		return err
 	}
 
-	// Save ledgerheader
-	ledgerHeader := app.currentHeader.GetLedgerHeaderData()
-	_, err = app.dataM.AddLedgerHeaderData(ledgerHeader)
-	if err != nil {
-		app.dataM.QTxRollback()
-		return err
-	}
-	stmt, err := app.dataM.PrepareTransaction()
-	if err != nil {
-		app.dataM.QTxRollback()
-		return err
-	}
-	for _, v := range app.blockExeInfo.txDatas {
-		v.LedgerHash = ethcmn.BytesToLedgerHash(app.currentHeader.Hash())
-		v.Height = app.currentHeader.Height
-		err = app.dataM.AddTransactionStmt(stmt, v)
-		if err != nil {
-			app.dataM.QTxRollback()
-			return err
-		}
-	}
-	stmt.Close()
+	//	// Save ledgerheader
+	//	ledgerHeader := app.currentHeader.GetLedgerHeaderData()
+	//	_, err = app.dataM.AddLedgerHeaderData(ledgerHeader)
+	//	if err != nil {
+	//		app.dataM.QTxRollback()
+	//		return err
+	//	}
+	//	stmt, err := app.dataM.PrepareTransaction()
+	//	if err != nil {
+	//		app.dataM.QTxRollback()
+	//		return err
+	//	}
+	//	for _, v := range app.blockExeInfo.txDatas {
+	//		v.LedgerHash = ethcmn.BytesToLedgerHash(app.currentHeader.Hash())
+	//		v.Height = app.currentHeader.Height
+	//		err = app.dataM.AddTransactionStmt(stmt, v)
+	//		if err != nil {
+	//			app.dataM.QTxRollback()
+	//			return err
+	//		}
+	//	}
+	//	stmt.Close()
 
 	//save action
-	stmt, err = app.dataM.PrepareAction()
+	stmt, err := app.dataM.PrepareAction()
 	if err != nil {
 		app.dataM.QTxRollback()
 		return err
