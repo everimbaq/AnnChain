@@ -29,6 +29,7 @@ import (
 	rpc "github.com/dappledger/AnnChain/ann-module/lib/go-rpc/server"
 	"github.com/dappledger/AnnChain/ann-module/lib/go-wire"
 	"github.com/dappledger/AnnChain/genesis/chain/version"
+	ethcmn "github.com/dappledger/AnnChain/genesis/eth/common"
 	"github.com/dappledger/AnnChain/genesis/eth/rlp"
 	"github.com/dappledger/AnnChain/genesis/types"
 )
@@ -195,8 +196,23 @@ func (h *rpcHandler) Block(height int) (at.RPCResult, at.CodeType, error) {
 
 func (h *rpcHandler) Validators() (interface{}, at.CodeType, error) {
 	height, vs := h.node.Angine.GetValidators()
+	genesisvs := strings.Split(version.GetCommitVersion(), "-")
+	var vsarr []*at.QueryValidator
+	for _, validatorsValue := range vs {
+		valida := &at.QueryValidator{
+			Address:     ethcmn.ToHex(validatorsValue.Address),
+			PubKey:      validatorsValue.PubKey.KeyString(),
+			VotingPower: validatorsValue.VotingPower,
+			Accum:       validatorsValue.Accum,
+			IsCA:        validatorsValue.IsCA,
+			RPCAddress:  validatorsValue.RPCAddress,
+		}
+		vsarr = append(vsarr, valida)
+	}
+
 	validators := &at.ResultValidators{
-		Validators:  vs,
+		Validators:  vsarr,
+		Version:     genesisvs[0],
 		BlockHeight: height,
 	}
 	return &validators, at.CodeType_OK, nil
