@@ -695,6 +695,12 @@ func (app *GenesisApp) QueryLedgers(order string, limit uint64, cursor uint64) a
 // query ledger info
 func (app *GenesisApp) QueryLedger(height uint64) at.NewRPCResult {
 	// query leveldb
+	if height == 0 {
+		return at.NewRpcError(at.CodeType_BaseInvalidInput, "height must be greater than 0")
+	}
+	if height >= uint64(app.currentHeader.Height.Uint64()) {
+		return at.NewRpcError(at.CodeType_BaseInvalidInput, "height must be less than the current blockchain height")
+	}
 	ledgerHash := app.ReadHeaderCanonicalHash(new(big.Int).SetUint64(height))
 	ledgerData := app.ReadHeaderRLP(ledgerHash.Bytes(), height)
 
