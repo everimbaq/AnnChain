@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 package datamanager
 
 import (
@@ -32,8 +31,8 @@ func (m *DataManager) AddLedgerHeaderData(data *types.LedgerHeaderData) (uint64,
 
 	fields := []database.Feild{
 		database.Feild{Name: "height", Value: data.Height.String()},
-		database.Feild{Name: "hash", Value: data.Hash.Hex()},
-		database.Feild{Name: "prevhash", Value: data.PrevHash.Hex()},
+		database.Feild{Name: "hash", Value: data.Hash},
+		database.Feild{Name: "prevhash", Value: data.PrevHash},
 		database.Feild{Name: "transactioncount", Value: data.TransactionCount},
 		database.Feild{Name: "closedat", Value: data.ClosedAt},
 		database.Feild{Name: "totalcoins", Value: data.TotalCoins.String()},

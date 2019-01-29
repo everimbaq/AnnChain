@@ -34,15 +34,15 @@ type TradeData struct {
 
 // LedgerHeaderData object for app
 type LedgerHeaderData struct {
-	LedgerID         uint64            `json:"id"`
-	Height           *big.Int          `json:"height"`
-	Hash             ethcmn.LedgerHash `json:"hash"`
-	PrevHash         ethcmn.LedgerHash `json:"prev_hash"`
-	TransactionCount uint64            `json:"transaction_count"`
-	ClosedAt         time.Time         `json:"closed_at"`
-	TotalCoins       *big.Int          `json:"total_coins"`
-	BaseFee          *big.Int          `json:"base_fee"`
-	MaxTxSetSize     uint64            `json:"max_tx_set_size"`
+	LedgerID         uint64   `json:"id"`
+	Height           *big.Int `json:"height"`
+	Hash             string   `json:"hash"`
+	PrevHash         string   `json:"prev_hash"`
+	TransactionCount uint64   `json:"transaction_count"`
+	ClosedAt         string   `json:"closed_at"`
+	TotalCoins       *big.Int `json:"total_coins"`
+	BaseFee          *big.Int `json:"base_fee"`
+	MaxTxSetSize     uint64   `json:"max_tx_set_size"`
 }
 
 // TransactionData object for app
@@ -79,6 +79,18 @@ type LedgerHeaderQueryData struct {
 	MaxTxSetSize     uint64    `json:"max_tx_set_size"`
 }
 
+//type QueryLedgerHeaderData struct {
+//	LedgerID         uint64   `json:"id"`
+//	Height           *big.Int `json:"height"`
+//	Hash             string   `json:"hash"`
+//	PrevHash         string   `json:"hash"`
+//	TransactionCount uint64   `json:"transaction_count"`
+//	ClosedAt         string   `json:"closed_at"`
+//	TotalCoins       *big.Int `json:"total_coins"`
+//	BaseFee          *big.Int `json:"base_fee"`
+//	MaxTxSetSize     uint64   `json:"max_tx_set_size"`
+//}
+
 type TransactionQueryData struct {
 	Hash     ethcmn.Hash    `json:"hash"`
 	Height   *big.Int       `json:"height"`
@@ -89,6 +101,18 @@ type TransactionQueryData struct {
 	BaseFee  *big.Int       `json:"basefee"`
 	OpType   string         `json:"optype"`
 	Memo     string         `json:"memo"`
+}
+
+type TransactionLedgerQueryData struct {
+	Hash      string `json:"hash"`
+	Height    uint64 `json:"height"`
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Nonce     string `json:"nonce"`
+	BaseFee   string `json:"basefee"`
+	OpType    string `json:"optype"`
+	Memo      string `json:"memo"`
+	Operation string `json:"operation"`
 }
 
 // ActionObject interface
