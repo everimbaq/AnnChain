@@ -15,6 +15,7 @@
 package app
 
 import (
+	"encoding/json"
 	"math/big"
 	"strconv"
 
@@ -51,7 +52,7 @@ func (ca *DoCreateContract) CheckValid(stateDup *stateDup) error {
 func (ca *DoCreateContract) Apply(stateDup *stateDup) error {
 
 	var (
-		jsLogs   []string
+		jsLogs   []*json.RawMessage
 		sreceipt *types.Receipt
 	)
 	nLimit, err := strconv.ParseInt(ca.op.GasLimit, 10, 64)
@@ -102,7 +103,8 @@ func (ca *DoCreateContract) Apply(stateDup *stateDup) error {
 				if err != nil {
 					bytLog = []byte("")
 				}
-				jsLogs = append(jsLogs, string(bytLog))
+				raw := json.RawMessage(bytLog)
+				jsLogs = append(jsLogs, &raw)
 			}
 		}
 		ca.op.ContractAddr = receipt.ContractAddress.Hex()

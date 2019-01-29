@@ -15,6 +15,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"strconv"
@@ -58,7 +59,7 @@ func (ca *DoExcuteContract) CheckValid(stateDup *stateDup) error {
 
 func (ca *DoExcuteContract) Apply(stateDup *stateDup) error {
 	var (
-		jsLogs   []string
+		jsLogs   []*json.RawMessage
 		sreceipt *types.Receipt
 		err      error
 	)
@@ -113,7 +114,8 @@ func (ca *DoExcuteContract) Apply(stateDup *stateDup) error {
 				if err != nil {
 					bytLog = []byte("")
 				}
-				jsLogs = append(jsLogs, string(bytLog))
+				raw := json.RawMessage(bytLog)
+				jsLogs = append(jsLogs, &raw)
 			}
 		}
 
