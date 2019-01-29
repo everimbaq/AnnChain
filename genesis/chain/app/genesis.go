@@ -368,11 +368,6 @@ func (app *GenesisApp) ExecuteTx(stateDup *stateDup, bs []byte) (err error) {
 
 	action.GetActionBase().TxHash = tx.Hash()
 
-	//	for idx := range effects {
-	//		effects[idx].GetEffectBase().CreateAt = tx.GetCreateTime()
-	//		effects[idx].GetEffectBase().TxHash = tx.Hash()
-	//	}
-
 	app.blockExeInfo.effectG = append(app.blockExeInfo.effectG, &types.EffectGroup{
 		Action:  action,
 		Effects: effects,
@@ -503,29 +498,6 @@ func (app *GenesisApp) SaveDBData() error {
 		return err
 	}
 
-	//	// Save ledgerheader
-	//	ledgerHeader := app.currentHeader.GetLedgerHeaderData()
-	//	_, err = app.dataM.AddLedgerHeaderData(ledgerHeader)
-	//	if err != nil {
-	//		app.dataM.QTxRollback()
-	//		return err
-	//	}
-	//	stmt, err := app.dataM.PrepareTransaction()
-	//	if err != nil {
-	//		app.dataM.QTxRollback()
-	//		return err
-	//	}
-	//	for _, v := range app.blockExeInfo.txDatas {
-	//		v.LedgerHash = ethcmn.BytesToLedgerHash(app.currentHeader.Hash())
-	//		v.Height = app.currentHeader.Height
-	//		err = app.dataM.AddTransactionStmt(stmt, v)
-	//		if err != nil {
-	//			app.dataM.QTxRollback()
-	//			return err
-	//		}
-	//	}
-	//	stmt.Close()
-
 	//save action
 	stmt, err := app.dataM.PrepareAction()
 	if err != nil {
@@ -542,24 +514,6 @@ func (app *GenesisApp) SaveDBData() error {
 	}
 	stmt.Close()
 
-	//	//save effect
-	//	stmt, err = app.dataM.PrepareEffect()
-	//	if err != nil {
-	//		app.dataM.QTxRollback()
-	//		return err
-	//	}
-	//	for _, a := range app.blockExeInfo.effectG {
-	//		for _, e := range a.Effects {
-	//			e.GetEffectBase().Height = app.currentHeader.Height
-	//			e.GetEffectBase().ActionID = a.ActionID
-	//			err = app.dataM.AddEffectDataStmt(stmt, e)
-	//			if err != nil {
-	//				app.dataM.QTxRollback()
-	//				return err
-	//			}
-	//		}
-	//	}
-	//	stmt.Close()
 	// commit dbtx
 	err = app.dataM.QTxCommit()
 	if err != nil {

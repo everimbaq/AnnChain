@@ -490,18 +490,24 @@ func (h *rpcHandler) QueryLedgerTransactions(height uint64, order string, limit 
 	}
 	res := at.ResultBlock{}
 	res.Block, res.BlockMeta = h.node.Angine.GetBlock(int(height))
-	txResults := []*types.Transaction{}
+	var txResults []types.TransactionLedgerQueryData
 	for _, txData := range res.Block.Data.Txs {
 		txResult := &types.Transaction{}
 		if err := rlp.DecodeBytes(txData, &txResult); err != nil {
 			return nil, at.CodeType_WrongRLP, fmt.Errorf("decode error")
 		}
-
-		//		opCreateAccount := new(types.CreateAccount)
-		//		if err := json.Unmarshal(txResult.Data.Operation, opCreateAccount); err != nil {
-		//			return nil, err
-		//		}
-		txResults = append(txResults, txResult)
+		td := types.TransactionLedgerQueryData{
+			Hash:    txResult.Hash().Hex(),
+			From:    txResult.Data.From,
+			To:      txResult.Data.To,
+			Height:  height,
+			Nonce:   txResult.Data.Nonce,
+			BaseFee: txResult.Data.Basefee,
+			OpType:  txResult.Data.OpType,
+			Memo:    txResult.Data.Memo,
+			//			Operation: txResult.Data.Operation,
+		}
+		txResults = append(txResults, td)
 	}
 	return &txResults, at.CodeType_OK, nil
 }

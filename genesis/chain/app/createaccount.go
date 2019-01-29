@@ -92,34 +92,5 @@ func (ca *DoCreateAccount) effects() {
 		StartingBalance: ca.op.StartBalance,
 	}
 
-	//	efts := []types.EffectObject{
-
-	//		&types.EffectAccountCreated{
-	//			EffectBase: types.EffectBase{
-	//				Typei:   types.EffectTypeAccountCreated,
-	//				Type:    types.EffectTypeAccountCreated.String(),
-	//				Account: ca.op.TargetAddress,
-	//			},
-	//			StartingBalance: ca.op.StartBalance,
-	//		},
-
-	//		&types.EffectAccountCredited{
-	//			EffectBase: types.EffectBase{
-	//				Typei:   types.EffectTypeAccountCredited,
-	//				Type:    types.EffectTypeAccountCredited.String(),
-	//				Account: ca.op.TargetAddress,
-	//			},
-	//			Amount: ca.op.StartBalance.String(),
-	//		},
-
-	//		&types.EffectAccountDebited{
-	//			EffectBase: types.EffectBase{
-	//				Typei:   types.EffectTypeAccountDebited,
-	//				Type:    types.EffectTypeAccountDebited.String(),
-	//				Account: ca.op.Source,
-	//			},
-	//			Amount: ca.op.StartBalance.String(),
-	//		},
-	//	}
 	ca.op.SetEffects(act, []types.EffectObject{})
 }

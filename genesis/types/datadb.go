@@ -103,6 +103,18 @@ type TransactionQueryData struct {
 	Memo     string         `json:"memo"`
 }
 
+type TransactionLedgerQueryData struct {
+	Hash      string `json:"hash"`
+	Height    uint64 `json:"height"`
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Nonce     string `json:"nonce"`
+	BaseFee   string `json:"basefee"`
+	OpType    string `json:"optype"`
+	Memo      string `json:"memo"`
+	Operation string `json:"operation"`
+}
+
 // ActionObject interface
 type ActionObject interface {
 	GetActionBase() *ActionBase

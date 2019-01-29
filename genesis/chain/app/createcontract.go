@@ -149,19 +149,5 @@ func (ca *DoCreateContract) effects() {
 		Gas:          ca.gas,
 	}
 
-	//	efts := []types.EffectObject{
-	//		&types.EffectCreateContract{
-	//			EffectBase: types.EffectBase{
-	//				Typei:   types.EffectTypeCreateContract,
-	//				Type:    types.EffectTypeCreateContract.String(),
-	//				Account: ca.op.Source,
-	//			},
-	//			ContractAddr: ca.op.ContractAddr,
-	//			Amount:       ca.op.Amount,
-	//			GasLimit:     ca.op.GasLimit,
-	//			Price:        ca.op.Price,
-	//			Gas:          ca.gas,
-	//		},
-	//	}
 	ca.op.SetEffects(act, []types.EffectObject{})
 }
