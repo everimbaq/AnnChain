@@ -123,6 +123,7 @@ func Initialize(tune *AngineTunes) {
 	} else {
 		conf = tune.Conf
 	}
+
 	priv := genPrivFile(conf.GetString("priv_validator_file"))
 	gvs := []types.GenesisValidator{types.GenesisValidator{
 		PubKey:     priv.PubKey,
