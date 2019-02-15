@@ -66,8 +66,9 @@ type Peer struct {
 }
 
 type ResultValidators struct {
-	BlockHeight int          `json:"block_height"`
-	Validators  []*Validator `json:"validators"`
+	BlockHeight int               `json:"block_height"`
+	Validators  []*QueryValidator `json:"validators"`
+	Version     string            `json:"version"`
 }
 
 type ResultDumpConsensusState struct {

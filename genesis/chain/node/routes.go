@@ -29,6 +29,7 @@ import (
 	rpc "github.com/dappledger/AnnChain/ann-module/lib/go-rpc/server"
 	"github.com/dappledger/AnnChain/ann-module/lib/go-wire"
 	"github.com/dappledger/AnnChain/genesis/chain/version"
+	ethcmn "github.com/dappledger/AnnChain/genesis/eth/common"
 	"github.com/dappledger/AnnChain/genesis/eth/rlp"
 	"github.com/dappledger/AnnChain/genesis/types"
 )
@@ -82,16 +83,10 @@ func (n *Node) rpcRoutes() map[string]*rpc.RPCFunc {
 		"info":                 rpc.NewRPCFunc(h.Info, argsWithChainID("")),
 
 		// Query RPC
-		"query_nonce":   rpc.NewRPCFunc(h.QueryNonce, argsWithChainID("address")),
-		"query_account": rpc.NewRPCFunc(h.QueryAccount, argsWithChainID("address")),
-		//		"query_ledgers":                     rpc.NewRPCFunc(h.QueryLedgers, argsWithChainID("order,limit,cursor")),
-		"query_ledger": rpc.NewRPCFunc(h.QueryLedger, argsWithChainID("height")),
-		//		"query_payments":                    rpc.NewRPCFunc(h.QueryPayments, argsWithChainID("order,limit,cursor")),
-		//		"query_account_payments":            rpc.NewRPCFunc(h.QueryAccountPayments, argsWithChainID("address,order,limit,cursor")),
-		//		"query_payment":                     rpc.NewRPCFunc(h.QueryPayment, argsWithChainID("txhash")),
-		//		"query_transactions":                rpc.NewRPCFunc(h.QueryTransactions, argsWithChainID("order,limit,cursor")),
-		"query_transaction": rpc.NewRPCFunc(h.QueryTransaction, argsWithChainID("txhash")),
-		//		"query_account_transactions":        rpc.NewRPCFunc(h.QueryAccountTransactions, argsWithChainID("address,order,limit,cursor")),
+		"query_nonce":                       rpc.NewRPCFunc(h.QueryNonce, argsWithChainID("address")),
+		"query_account":                     rpc.NewRPCFunc(h.QueryAccount, argsWithChainID("address")),
+		"query_ledger":                      rpc.NewRPCFunc(h.QueryLedger, argsWithChainID("height")),
+		"query_transaction":                 rpc.NewRPCFunc(h.QueryTransaction, argsWithChainID("txhash")),
 		"query_contract":                    rpc.NewRPCFunc(h.QueryDoContract, argsWithChainID("byte[]")),
 		"query_contract_exist":              rpc.NewRPCFunc(h.QueryContractExist, argsWithChainID("address")),
 		"query_receipt":                     rpc.NewRPCFunc(h.QueryReceipt, argsWithChainID("txhash")),
@@ -201,8 +196,23 @@ func (h *rpcHandler) Block(height int) (at.RPCResult, at.CodeType, error) {
 
 func (h *rpcHandler) Validators() (interface{}, at.CodeType, error) {
 	height, vs := h.node.Angine.GetValidators()
+	genesisvs := strings.Split(version.GetCommitVersion(), "-")
+	var vsarr []*at.QueryValidator
+	for _, validatorsValue := range vs {
+		valida := &at.QueryValidator{
+			Address:     ethcmn.ToHex(validatorsValue.Address),
+			PubKey:      validatorsValue.PubKey.KeyString(),
+			VotingPower: validatorsValue.VotingPower,
+			Accum:       validatorsValue.Accum,
+			IsCA:        validatorsValue.IsCA,
+			RPCAddress:  validatorsValue.RPCAddress,
+		}
+		vsarr = append(vsarr, valida)
+	}
+
 	validators := &at.ResultValidators{
-		Validators:  vs,
+		Validators:  vsarr,
+		Version:     genesisvs[0],
 		BlockHeight: height,
 	}
 	return &validators, at.CodeType_OK, nil

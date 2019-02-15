@@ -38,6 +38,15 @@ type Validator struct {
 	RPCAddress  string        `json:"rpc"`
 }
 
+type QueryValidator struct {
+	Address     string `json:"address"`
+	PubKey      string `json:"pub_key"`
+	VotingPower int64  `json:"voting_power"`
+	Accum       int64  `json:"accum"`
+	IsCA        bool   `json:"is_ca"`
+	RPCAddress  string `json:"rpc"`
+}
+
 type ValidatorAttr struct {
 	PubKey     []byte `json:"pubKey,omitempty"`
 	Power      uint64 `json:"power,omitempty"`

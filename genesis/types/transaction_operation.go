@@ -50,7 +50,7 @@ type QueryContract struct {
 
 type SpecialOp struct {
 	IsCA       bool   `json:"isCA"`
-	Public     string `json:"public"`
+	Public     string `json:"pubkey"`
 	Sigs       string `json:"sigs"`
 	OpCode     int8   `json:"opcode"`
 	RpcAddress string `json:"rpc_address"`
