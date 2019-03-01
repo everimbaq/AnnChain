@@ -48,7 +48,6 @@ import (
 )
 
 const (
-	OfficialAddress     = "0xed1de12230e28f561c67e63e5b765a671af2afb2"
 	StateRemoveEmptyObj = false
 
 	LDatabaseCache   = 128
