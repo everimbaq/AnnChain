@@ -441,7 +441,7 @@ func (app *GenesisApp) OnCommit(height, round int, block *at.Block) (interface{}
 	err = app.SaveDBData()
 	if err != nil {
 		logger.Error("Save db data failed:" + err.Error())
-		panic(err)
+		cmn.PanicCrisis(err)
 	}
 	ledgerHeader := app.currentHeader.GetLedgerHeaderData()
 	app.WriteHeaderCanonicalHash(appHash, app.currentHeader.Height)
