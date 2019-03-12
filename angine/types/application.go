@@ -32,15 +32,9 @@ type Application interface {
 	CheckTx([]byte) Result
 	QueryNonce(string) NewRPCResult
 	QueryAccount(string) NewRPCResult
-	QueryLedgers(string, uint64, uint64) NewRPCResult
+	//	QueryLedgers(string, uint64, uint64) NewRPCResult
 	QueryLedger(uint64) NewRPCResult
-	QueryPayments(string, uint64, uint64) NewRPCResult
-	QueryAccountPayments(string, string, uint64, uint64) NewRPCResult
-	QueryPayment(string) NewRPCResult
-	QueryTransactions(string, uint64, uint64) NewRPCResult
 	QueryTransaction(string) NewRPCResult
-	QueryAccountTransactions(string, string, uint64, uint64) NewRPCResult
-	QueryLedgerTransactions(uint64, string, uint64, uint64) NewRPCResult
 	QueryDoContract([]byte) NewRPCResult
 	QueryContractExist(string) NewRPCResult
 	QueryReceipt(string) NewRPCResult

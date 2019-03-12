@@ -93,7 +93,7 @@ func (n *Node) rpcRoutes() map[string]*rpc.RPCFunc {
 		"query_account_managedatas":         rpc.NewRPCFunc(h.QueryAccountManagedatas, argsWithChainID("address,order,limit,cursor")),
 		"query_account_managedata":          rpc.NewRPCFunc(h.QueryAccountManagedata, argsWithChainID("address,key")),
 		"query_account_category_managedata": rpc.NewRPCFunc(h.QueryAccountCategoryManagedata, argsWithChainID("address,category")),
-		"query_ledger_transactions":         rpc.NewRPCFunc(h.QueryLedgerTransactions, argsWithChainID("height,order,limit,cursor")),
+		"query_ledger_transactions":         rpc.NewRPCFunc(h.QueryLedgerTransactions, argsWithChainID("height")),
 
 		//Execute RPC
 		"create_account":     rpc.NewRPCFunc(h.BroadcastTx, argsWithChainID("tx")),
@@ -418,14 +418,14 @@ func (h *rpcHandler) QueryAccount(address string) (interface{}, at.CodeType, err
 	return result.Data, at.CodeType_OK, nil
 }
 
-func (h *rpcHandler) QueryLedgers(order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
-	result := h.node.Application.QueryLedgers(order, limit, cursor)
-	if result.Code != at.CodeType_OK {
-		return nil, result.Code, errors.New(result.Log)
-	}
+//func (h *rpcHandler) QueryLedgers(order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
+//	result := h.node.Application.QueryLedgers(order, limit, cursor)
+//	if result.Code != at.CodeType_OK {
+//		return nil, result.Code, errors.New(result.Log)
+//	}
 
-	return result.Data, at.CodeType_OK, nil
-}
+//	return result.Data, at.CodeType_OK, nil
+//}
 
 func (h *rpcHandler) QueryLedger(height uint64) (interface{}, at.CodeType, error) {
 	result := h.node.Application.QueryLedger(height)
@@ -433,39 +433,6 @@ func (h *rpcHandler) QueryLedger(height uint64) (interface{}, at.CodeType, error
 		return nil, result.Code, errors.New(result.Log)
 	}
 
-	return result.Data, at.CodeType_OK, nil
-}
-
-func (h *rpcHandler) QueryPayments(order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
-	result := h.node.Application.QueryPayments(order, limit, cursor)
-	if result.Code != at.CodeType_OK {
-		return nil, result.Code, errors.New(result.Log)
-	}
-
-	return result.Data, at.CodeType_OK, nil
-}
-
-func (h *rpcHandler) QueryAccountPayments(address string, order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
-	result := h.node.Application.QueryAccountPayments(address, order, limit, cursor)
-	if result.Code != at.CodeType_OK {
-		return nil, result.Code, errors.New(result.Log)
-	}
-	return result.Data, at.CodeType_OK, nil
-}
-
-func (h *rpcHandler) QueryPayment(txhash string) (interface{}, at.CodeType, error) {
-	result := h.node.Application.QueryPayment(txhash)
-	if result.Code != at.CodeType_OK {
-		return nil, result.Code, errors.New(result.Log)
-	}
-	return result.Data, at.CodeType_OK, nil
-}
-
-func (h *rpcHandler) QueryTransactions(order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
-	result := h.node.Application.QueryTransactions(order, limit, cursor)
-	if result.Code != at.CodeType_OK {
-		return nil, result.Code, errors.New(result.Log)
-	}
 	return result.Data, at.CodeType_OK, nil
 }
 
@@ -477,15 +444,7 @@ func (h *rpcHandler) QueryTransaction(txhash string) (interface{}, at.CodeType, 
 	return result.Data, at.CodeType_OK, nil
 }
 
-func (h *rpcHandler) QueryAccountTransactions(address string, order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
-	result := h.node.Application.QueryAccountTransactions(address, order, limit, cursor)
-	if result.Code != at.CodeType_OK {
-		return nil, result.Code, errors.New(result.Log)
-	}
-	return result.Data, at.CodeType_OK, nil
-}
-
-func (h *rpcHandler) QueryLedgerTransactions(height uint64, order string, limit uint64, cursor uint64) (interface{}, at.CodeType, error) {
+func (h *rpcHandler) QueryLedgerTransactions(height uint64) (interface{}, at.CodeType, error) {
 	if height == 0 {
 		return nil, at.CodeType_BaseInvalidInput, fmt.Errorf("height must be greater than 0")
 	}
@@ -509,7 +468,6 @@ func (h *rpcHandler) QueryLedgerTransactions(height uint64, order string, limit 
 			BaseFee: txResult.Data.Basefee,
 			OpType:  txResult.Data.OpType,
 			Memo:    txResult.Data.Memo,
-			//			Operation: txResult.Data.Operation,
 		}
 		txResults = append(txResults, td)
 	}

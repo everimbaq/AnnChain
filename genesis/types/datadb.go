@@ -271,18 +271,18 @@ type OperationDBItfc interface {
 	AddActionData(o ActionObject) (uint64, error)
 	QueryActionData(q ActionsQuery) ([]ActionData, error)
 
-	// ops for effects
-	AddEffectData(o EffectObject) (uint64, error)
-	QueryEffectData(q EffectsQuery) ([]EffectData, error)
+	//	// ops for effects
+	//	AddEffectData(o EffectObject) (uint64, error)
+	//	QueryEffectData(q EffectsQuery) ([]EffectData, error)
 
-	// ops for ledgerheader
-	AddLedgerHeaderData(data *LedgerHeaderData) (uint64, error)
-	QueryLedgerHeaderData(seq *big.Int) (*LedgerHeaderQueryData, error)
-	QueryAllLedgerHeaderData(cursor, limit uint64, order string) ([]LedgerHeaderQueryData, error)
+	//	// ops for ledgerheader
+	//	AddLedgerHeaderData(data *LedgerHeaderData) (uint64, error)
+	//	QueryLedgerHeaderData(seq *big.Int) (*LedgerHeaderQueryData, error)
+	//	QueryAllLedgerHeaderData(cursor, limit uint64, order string) ([]LedgerHeaderQueryData, error)
 
-	// ops for transaction
-	AddTransaction(data *TransactionData) (uint64, error)
-	QuerySingleTx(txhash *ethcmn.Hash) (*TransactionData, error)
-	QueryAccountTxs(accid *ethcmn.Address, cursor, limit uint64, order string) ([]TransactionQueryData, error)
-	QueryAllTxs(cursor, limit uint64, order string) ([]TransactionQueryData, error)
+	//	// ops for transaction
+	//	AddTransaction(data *TransactionData) (uint64, error)
+	//	QuerySingleTx(txhash *ethcmn.Hash) (*TransactionData, error)
+	//	QueryAccountTxs(accid *ethcmn.Address, cursor, limit uint64, order string) ([]TransactionQueryData, error)
+	//	QueryAllTxs(cursor, limit uint64, order string) ([]TransactionQueryData, error)
 }

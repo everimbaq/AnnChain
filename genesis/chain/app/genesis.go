@@ -25,7 +25,6 @@ import (
 
 	"encoding/binary"
 	"encoding/hex"
-	"strconv"
 
 	at "github.com/dappledger/AnnChain/angine/types"
 	cmn "github.com/dappledger/AnnChain/ann-module/lib/go-common"
@@ -687,11 +686,6 @@ func (app *GenesisApp) QueryAccount(address string) at.NewRPCResult {
 	return at.NewRpcResultOK(show, "")
 }
 
-// query all ledger's info
-func (app *GenesisApp) QueryLedgers(order string, limit uint64, cursor uint64) at.NewRPCResult {
-	return app.queryAllLedgers(cursor, limit, order)
-}
-
 // query ledger info
 func (app *GenesisApp) QueryLedger(height uint64) at.NewRPCResult {
 	// query leveldb
@@ -711,65 +705,6 @@ func (app *GenesisApp) QueryLedger(height uint64) at.NewRPCResult {
 	return at.NewRpcResultOK(ledger, "")
 }
 
-// query all payments
-func (app *GenesisApp) QueryPayments(order string, limit uint64, cursor uint64) at.NewRPCResult {
-	var query types.ActionsQuery
-	query.Order = order
-	query.Limit = limit
-	query.Cursor = cursor
-
-	query.Typei = uint64(types.OP_S_PAYMENT.OpInt())
-
-	return app.queryPaymentsData(query)
-}
-
-// query account's payments
-func (app *GenesisApp) QueryAccountPayments(address string, order string, limit uint64, cursor uint64) at.NewRPCResult {
-	if !ethcmn.IsHexAddress(address) {
-		return at.NewRpcError(at.CodeType_BaseInvalidInput, "Invalid address")
-	}
-	if strings.Index(address, "0x") == 0 {
-		address = address[2:]
-	}
-	account := ethcmn.HexToAddress(address)
-
-	var query types.ActionsQuery
-	query.Order = order
-	query.Limit = limit
-	query.Cursor = cursor
-	query.Account = account
-
-	query.Typei = uint64(types.OP_S_PAYMENT.OpInt())
-
-	return app.queryPaymentsData(query)
-}
-
-// query payment with txhash
-func (app *GenesisApp) QueryPayment(txhash string) at.NewRPCResult {
-	var query types.ActionsQuery
-
-	if txhash == "" {
-		return at.NewRpcError(at.CodeType_BaseInvalidInput, "Invalid txhash")
-	}
-
-	hash := ethcmn.HexToHash(txhash)
-
-	if len(hash) != ethcmn.HashLength {
-		return at.NewRpcError(at.CodeType_BaseInvalidInput, "Invalid txhash")
-	}
-
-	query.TxHash = hash
-	query.Typei = uint64(types.OP_S_PAYMENT.OpInt())
-
-	return app.queryPaymentsData(query)
-}
-
-// query all transactions
-func (app *GenesisApp) QueryTransactions(order string, limit uint64, cursor uint64) at.NewRPCResult {
-	//	var query types.ActionsQuery
-	return app.queryAllTxs(cursor, limit, order)
-}
-
 // query transaction with txhash
 func (app *GenesisApp) QueryTransaction(txhash string) at.NewRPCResult {
 	if txhash == "" {
@@ -787,29 +722,6 @@ func (app *GenesisApp) QueryTransaction(txhash string) at.NewRPCResult {
 	query.Typei = types.TypeiUndefined
 
 	return app.queryActionsData(query)
-}
-
-// query account's transactions
-func (app *GenesisApp) QueryAccountTransactions(address string, order string, limit uint64, cursor uint64) at.NewRPCResult {
-	if !ethcmn.IsHexAddress(address) {
-		return at.NewRpcError(at.CodeType_BaseInvalidInput, "Invalid address")
-	}
-	if strings.Index(address, "0x") == 0 {
-		address = address[2:]
-	}
-	account := ethcmn.HexToAddress(address)
-
-	if account == types.ZERO_ADDRESS {
-		return at.NewRpcError(at.CodeType_BaseInvalidInput, "Invalid address")
-	}
-
-	return app.queryAccountTxs(account, cursor, limit, order)
-}
-
-// query specific ledger's transactions
-func (app *GenesisApp) QueryLedgerTransactions(height uint64, order string, limit uint64, cursor uint64) at.NewRPCResult {
-	heightStr := strconv.FormatUint(height, 10)
-	return app.queryHeightTxs(heightStr, cursor, limit, order)
 }
 
 // query contract

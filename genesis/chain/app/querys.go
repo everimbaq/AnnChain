@@ -121,50 +121,6 @@ func (app *GenesisApp) queryDoContract(bs []byte) at.NewRPCResult {
 	return at.NewRpcResultOK(ethcmn.Bytes2Hex(res), "")
 }
 
-func (app *GenesisApp) queryAllLedgers(cursor, limit uint64, order string) at.NewRPCResult {
-	res, err := app.dataM.QueryAllLedgerHeaderData(cursor, limit, order)
-	if err != nil {
-		return at.NewRpcError(at.CodeType_InternalError, err.Error())
-	}
-
-	return at.NewRpcResultOK(res, "")
-}
-
-func (app *GenesisApp) queryLedger(seq *big.Int) at.NewRPCResult {
-	res, err := app.dataM.QueryLedgerHeaderData(seq)
-	if err != nil {
-		return at.NewRpcError(at.CodeType_InternalError, err.Error())
-	}
-
-	if res == nil {
-		return at.NewRpcError(at.CodeType_NullData, "No Data!")
-	}
-
-	return at.NewRpcResultOK(res, "")
-}
-
-func (app *GenesisApp) queryPaymentsData(q types.ActionsQuery) at.NewRPCResult {
-	res, err := app.dataM.QueryPaymentData(q)
-	if err != nil {
-		return at.NewRpcError(at.CodeType_InternalError, err.Error())
-	}
-
-	if res == nil {
-		return at.NewRpcError(at.CodeType_NullData, "No Data!")
-	}
-
-	return wrapActionResultData(res)
-}
-
-func (app *GenesisApp) queryEffectsData(q types.EffectsQuery) at.Result {
-	res, err := app.dataM.QueryEffectData(q)
-	if err != nil {
-		return at.NewError(at.CodeType_InternalError, err.Error())
-	}
-
-	return wrapEffectResultData(res)
-}
-
 func (app *GenesisApp) queryActionsData(q types.ActionsQuery) at.NewRPCResult {
 	res, err := app.dataM.QueryActionData(q)
 	if err != nil {
@@ -176,60 +132,6 @@ func (app *GenesisApp) queryActionsData(q types.ActionsQuery) at.NewRPCResult {
 	}
 
 	return wrapActionResultData(res)
-}
-
-func (app *GenesisApp) queryAllTxs(cursor, limit uint64, order string) at.NewRPCResult {
-	res, err := app.dataM.QueryAllTxs(cursor, limit, order)
-	if err != nil {
-		return at.NewRpcError(at.CodeType_InternalError, err.Error())
-	}
-
-	if res == nil {
-		return at.NewRpcError(at.CodeType_NullData, "No Data!")
-	}
-
-	return at.NewRpcResultOK(res, "")
-}
-
-func (app *GenesisApp) queryTx(txhash ethcmn.Hash) at.Result {
-	res, err := app.dataM.QuerySingleTx(&txhash)
-	if err != nil {
-		return at.NewError(at.CodeType_InternalError, err.Error())
-	}
-
-	if res == nil {
-		return at.NewError(at.CodeType_InternalError, "Not exist")
-	}
-
-	data := []types.TransactionData{*res}
-
-	return makeResultData(data)
-}
-
-func (app *GenesisApp) queryAccountTxs(addr ethcmn.Address, cursor, limit uint64, order string) at.NewRPCResult {
-	res, err := app.dataM.QueryAccountTxs(&addr, cursor, limit, order)
-	if err != nil {
-		return at.NewRpcError(at.CodeType_InternalError, err.Error())
-	}
-
-	if res == nil {
-		return at.NewRpcError(at.CodeType_NullData, "No Data!")
-	}
-
-	return at.NewRpcResultOK(res, "")
-}
-
-func (app *GenesisApp) queryHeightTxs(height string, cursor, limit uint64, order string) at.NewRPCResult {
-	res, err := app.dataM.QueryHeightTxs(height, cursor, limit, order)
-	if err != nil {
-		return at.NewRpcError(at.CodeType_InternalError, err.Error())
-	}
-
-	if res == nil {
-		return at.NewRpcError(at.CodeType_NullData, "No Data!")
-	}
-
-	return at.NewRpcResultOK(res, "")
 }
 
 func (app *GenesisApp) queryAccountManagedata(addr ethcmn.Address, category string, name string, cursor, limit uint64, order string) at.NewRPCResult {
